@@ -1,0 +1,600 @@
+/* ===== RESET & BASE ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; overflow-x: hidden; font-size: 16px; }
+body {
+  background: #050508;
+  color: #E8E6F0;
+  font-family: 'Space Grotesk', -apple-system, sans-serif;
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+a { color: inherit; text-decoration: none; cursor: pointer; }
+button { cursor: pointer; font-family: inherit; }
+ul { list-style: none; }
+img { max-width: 100%; display: block; }
+.mono { font-family: 'JetBrains Mono', monospace; }
+
+/* ===== CSS VARIABLES ===== */
+:root {
+  --accent: #54C5F8;
+  --flutter-blue: #54C5F8;
+  --flutter-cyan: #01FFFF;
+  --flutter-dark: #29B6F6;
+  --bg: #050508;
+  --bg2: #080B12;
+  --bg-card: rgba(255,255,255,0.03);
+  --border: rgba(255,255,255,0.07);
+  --border-hover: rgba(84,197,248,0.3);
+  --text-main: #E8E6F0;
+  --text-muted: #7A788A;
+  --text-dim: #4A4860;
+  --radius: 16px;
+  --radius-lg: 24px;
+  --nav-h: 68px;
+}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--flutter-blue); border-radius: 2px; }
+
+/* ===== SCROLL PROGRESS ===== */
+#scroll-progress {
+  position: fixed; top: 0; left: 0; height: 2px; width: 0%;
+  background: linear-gradient(90deg, var(--flutter-blue), var(--flutter-cyan));
+  z-index: 1000; transition: width 0.05s linear;
+  box-shadow: 0 0 6px rgba(84,197,248,0.7);
+}
+
+/* ===== LOADER ===== */
+#loader {
+  position: fixed; inset: 0; background: var(--bg); z-index: 9000;
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), visibility 0.8s;
+}
+#loader.done { opacity: 0; visibility: hidden; pointer-events: none; }
+.loader-inner { text-align: center; }
+.loader-logo {
+  font-family: 'Syne', sans-serif; font-weight: 800;
+  font-size: clamp(2.8rem, 7vw, 4.5rem); letter-spacing: 0.12em;
+  background: linear-gradient(135deg, var(--flutter-blue), var(--flutter-cyan));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  margin-bottom: 8px; animation: logoGlow 2s ease-in-out infinite;
+}
+@keyframes logoGlow {
+  0%,100% { filter: drop-shadow(0 0 16px rgba(84,197,248,0.4)); }
+  50% { filter: drop-shadow(0 0 36px rgba(84,197,248,0.75)); }
+}
+.loader-tagline {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;
+  color: var(--text-muted); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 40px;
+}
+.loader-bar-wrap {
+  width: 180px; height: 2px; background: rgba(255,255,255,0.07);
+  border-radius: 2px; overflow: hidden; margin: 0 auto;
+}
+.loader-bar {
+  height: 100%; width: 0%; border-radius: 2px;
+  background: linear-gradient(90deg, var(--flutter-blue), var(--flutter-cyan));
+  box-shadow: 0 0 10px rgba(84,197,248,0.6);
+  transition: width 1.2s cubic-bezier(0.16,1,0.3,1);
+}
+
+/* ===== NAV ===== */
+#nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+  transition: background 0.4s, border-color 0.4s;
+  border-bottom: 1px solid transparent;
+}
+#nav.scrolled {
+  background: rgba(5,5,8,0.88); backdrop-filter: blur(20px) saturate(1.4);
+  border-color: var(--border);
+}
+.nav-wrap {
+  max-width: 1200px; margin: 0 auto; height: var(--nav-h);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 32px;
+}
+.nav-logo {
+  font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.05rem;
+  letter-spacing: 0.14em;
+  background: linear-gradient(135deg, var(--flutter-blue), var(--flutter-cyan));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  flex-shrink: 0;
+}
+.nav-links { display: none; gap: 32px; align-items: center; }
+@media (min-width: 768px) { .nav-links { display: flex; } }
+.nav-links a {
+  font-size: 0.78rem; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--text-muted); transition: color 0.3s; position: relative;
+}
+.nav-links a::after {
+  content: ''; position: absolute; bottom: -4px; left: 0; right: 0;
+  height: 1px; background: var(--flutter-blue);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 0.3s cubic-bezier(0.16,1,0.3,1);
+}
+.nav-links a:hover,
+.nav-links a.active { color: var(--flutter-blue); }
+.nav-links a:hover::after,
+.nav-links a.active::after { transform: scaleX(1); }
+.nav-cta {
+  font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase;
+  border: 1px solid var(--border); padding: 8px 18px; border-radius: 999px;
+  color: var(--text-muted); transition: all 0.3s;
+  display: none; flex-shrink: 0;
+}
+@media (min-width: 640px) { .nav-cta { display: block; } }
+.nav-cta:hover {
+  border-color: var(--flutter-blue); color: var(--flutter-blue);
+  background: rgba(84,197,248,0.06);
+}
+.hamburger {
+  display: flex; flex-direction: column; gap: 5px;
+  background: none; border: none; width: 28px; padding: 0; height: 22px; justify-content: center;
+}
+@media (min-width: 768px) { .hamburger { display: none; } }
+.hamburger span {
+  display: block; width: 100%; height: 2px; background: var(--text-muted); border-radius: 2px;
+  transition: transform 0.35s cubic-bezier(0.16,1,0.3,1), opacity 0.25s, background 0.3s;
+}
+.hamburger:hover span { background: var(--flutter-blue); }
+.hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* ===== MOBILE MENU ===== */
+#menu-overlay {
+  position: fixed; inset: 0; background: rgba(5,5,8,0.72); backdrop-filter: blur(6px);
+  z-index: 600; opacity: 0; pointer-events: none; transition: opacity 0.35s;
+}
+#menu-overlay.open { opacity: 1; pointer-events: auto; }
+#mobile-menu {
+  position: fixed; top: 0; right: 0; width: min(300px, 82vw); height: 100%;
+  background: var(--bg2); border-left: 1px solid var(--border); z-index: 700;
+  transform: translateX(105%); transition: transform 0.45s cubic-bezier(0.16,1,0.3,1);
+  display: flex; flex-direction: column; justify-content: center; padding: 40px 36px; gap: 0;
+}
+#mobile-menu.open { transform: translateX(0); }
+.mobile-close {
+  position: absolute; top: 20px; right: 20px; background: none; border: none;
+  color: var(--text-muted); font-size: 1.4rem; transition: color 0.3s; line-height: 1;
+}
+.mobile-close:hover { color: var(--flutter-blue); }
+#mobile-menu nav { display: flex; flex-direction: column; gap: 0; margin-bottom: 36px; }
+#mobile-menu nav a {
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.75rem;
+  color: var(--text-main); border-bottom: 1px solid var(--border);
+  padding: 13px 0; display: block;
+  transition: color 0.3s, padding-left 0.3s;
+}
+#mobile-menu nav a:hover { color: var(--flutter-blue); padding-left: 6px; }
+.mobile-socials { display: flex; gap: 16px; flex-wrap: wrap; }
+.mobile-socials a {
+  font-size: 0.72rem; color: var(--text-muted); letter-spacing: 0.1em;
+  text-transform: uppercase; transition: color 0.3s;
+}
+.mobile-socials a:hover { color: var(--flutter-blue); }
+
+/* ===== LAYOUT ===== */
+.container { max-width: 1200px; margin: 0 auto; padding: 0 32px; }
+@media (max-width: 480px) { .container { padding: 0 18px; } }
+@media (min-width: 481px) and (max-width: 767px) { .container { padding: 0 24px; } }
+
+.section { padding: 110px 0; position: relative; }
+@media (max-width: 767px) { .section { padding: 72px 0; } }
+.section-tint { background: var(--bg2); }
+
+.section-label {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+  color: var(--text-muted); letter-spacing: 0.18em; text-transform: uppercase;
+  margin-bottom: 48px; border: 1px solid var(--border); padding: 7px 14px;
+  border-radius: 999px; background: rgba(255,255,255,0.02);
+}
+.section-label .mono { color: var(--flutter-blue); }
+
+/* ===== REVEAL ANIMATIONS ===== */
+.reveal, .reveal-up {
+  opacity: 0; transform: translateY(24px);
+  transition: opacity 0.75s cubic-bezier(0.16,1,0.3,1), transform 0.75s cubic-bezier(0.16,1,0.3,1);
+}
+.reveal.visible, .reveal-up.visible { opacity: 1; transform: translateY(0); }
+.reveal-up { transition-delay: var(--d, 0s); }
+
+/* ===== HERO ===== */
+.hero {
+  position: relative; min-height: 100vh; display: flex; align-items: center;
+  overflow: hidden; padding-top: var(--nav-h);
+}
+#hero-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.hero-content {
+  position: relative; z-index: 2; width: 100%; max-width: 1200px; margin: 0 auto;
+  padding: 48px 32px 64px;
+}
+@media (max-width: 480px) { .hero-content { padding: 40px 18px 56px; } }
+@media (min-width: 481px) and (max-width: 767px) { .hero-content { padding: 44px 24px 60px; } }
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  border: 1px solid rgba(84,197,248,0.22); border-radius: 999px;
+  padding: 7px 15px; margin-bottom: 28px;
+  background: rgba(84,197,248,0.05); backdrop-filter: blur(10px);
+  font-size: 0.78rem; color: var(--flutter-blue); letter-spacing: 0.04em;
+}
+.badge-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: #4ade80; flex-shrink: 0;
+  animation: pulseDot 2s ease-in-out infinite;
+}
+@keyframes pulseDot {
+  0% { box-shadow: 0 0 0 0 rgba(74,222,128,0.6); }
+  70% { box-shadow: 0 0 0 7px rgba(74,222,128,0); }
+  100% { box-shadow: 0 0 0 0 rgba(74,222,128,0); }
+}
+
+.hero-name {
+  font-family: 'Syne', sans-serif; font-weight: 800;
+  font-size: clamp(2.8rem, 8vw, 6.4rem); line-height: 0.9;
+  margin-bottom: 22px; display: block; letter-spacing: -0.02em;
+}
+.hero-name .line { display: block; }
+.hero-name .line:first-child { color: var(--text-main); }
+.hero-name .accent-stroke {
+  -webkit-text-stroke: 2px var(--flutter-blue);
+  -webkit-text-fill-color: transparent; color: transparent;
+  filter: drop-shadow(0 0 24px rgba(84,197,248,0.25));
+}
+
+.hero-role {
+  font-size: clamp(1rem, 2.2vw, 1.3rem); color: var(--text-muted);
+  margin-bottom: 18px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  min-height: 1.8em;
+}
+.role-tag {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.88em;
+  background: linear-gradient(135deg, var(--flutter-blue), var(--flutter-cyan));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  font-weight: 600;
+}
+#role-display { color: var(--text-muted); }
+
+.hero-desc {
+  font-size: clamp(0.9rem, 1.6vw, 1.05rem); color: var(--text-muted);
+  max-width: 520px; line-height: 1.8; margin-bottom: 36px;
+}
+
+.hero-actions { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 48px; align-items: center; }
+
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: linear-gradient(135deg, var(--flutter-blue), #29B6F6);
+  color: #050508; font-weight: 600; font-size: 0.82rem;
+  letter-spacing: 0.05em; padding: 13px 26px; border-radius: 999px;
+  transition: transform 0.25s, box-shadow 0.25s, filter 0.25s;
+  box-shadow: 0 0 24px rgba(84,197,248,0.28);
+}
+.btn-primary:hover {
+  transform: translateY(-2px); filter: brightness(1.08);
+  box-shadow: 0 8px 36px rgba(84,197,248,0.45);
+}
+.btn-primary:active { transform: translateY(0); }
+
+.btn-ghost {
+  display: inline-flex; align-items: center; gap: 8px;
+  border: 1px solid var(--border); color: var(--text-muted);
+  font-size: 0.82rem; letter-spacing: 0.05em; padding: 13px 26px;
+  border-radius: 999px; transition: all 0.3s;
+}
+.btn-ghost:hover { border-color: var(--flutter-blue); color: var(--flutter-blue); background: rgba(84,197,248,0.05); }
+
+.hero-stats { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+@media (max-width: 380px) { .hero-stats { gap: 16px; } }
+.stat { display: flex; flex-direction: column; gap: 2px; }
+.stat-num {
+  font-family: 'Syne', sans-serif; font-weight: 800;
+  font-size: clamp(1.1rem, 2.5vw, 1.5rem); line-height: 1;
+  background: linear-gradient(135deg, var(--flutter-blue), var(--flutter-cyan));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.stat-label { font-size: 0.65rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; }
+.stat-divider { width: 1px; height: 28px; background: var(--border); }
+
+/* ===== ABOUT ===== */
+.about-grid {
+  display: grid; grid-template-columns: 1fr; gap: 48px; align-items: start;
+}
+@media (min-width: 640px) {
+  .about-grid { grid-template-columns: 260px 1fr; gap: 56px; align-items: center; }
+}
+@media (min-width: 1024px) {
+  .about-grid { grid-template-columns: 300px 1fr; gap: 80px; }
+}
+
+.about-photo-wrap {
+  position: relative; display: flex; justify-content: center;
+  flex-shrink: 0;
+}
+.about-photo {
+  width: min(260px, 80vw); aspect-ratio: 3/4; border-radius: 20px; overflow: hidden;
+  border: 1px solid var(--border); position: relative;
+}
+@media (min-width: 640px) { .about-photo { width: 100%; } }
+.about-photo img {
+  width: 100%; height: 100%; object-fit: cover; object-position: center top;
+  transition: transform 0.55s cubic-bezier(0.16,1,0.3,1);
+  filter: brightness(0.92) saturate(1.1);
+}
+.about-photo:hover img { transform: scale(1.04); }
+.photo-glow {
+  position: absolute; inset: 0; border-radius: 20px;
+  background: linear-gradient(135deg, rgba(84,197,248,0.1) 0%, transparent 60%);
+  pointer-events: none;
+}
+.photo-badge {
+  position: absolute; bottom: -14px; right: -8px;
+  background: linear-gradient(135deg, var(--flutter-blue), var(--flutter-dark));
+  color: #050508; padding: 9px 16px; border-radius: 999px;
+  display: flex; align-items: center; gap: 7px; font-size: 0.76rem; font-weight: 600;
+  letter-spacing: 0.04em; box-shadow: 0 6px 28px rgba(84,197,248,0.38);
+  white-space: nowrap;
+}
+.flutter-icon { width: 14px; height: 14px; flex-shrink: 0; }
+
+.about-title {
+  font-family: 'Syne', sans-serif; font-weight: 800;
+  font-size: clamp(1.7rem, 3.5vw, 2.6rem); line-height: 1.15; margin-bottom: 20px;
+}
+.about-title em {
+  font-style: normal;
+  background: linear-gradient(135deg, var(--flutter-blue), var(--flutter-cyan));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.about-bio { color: var(--text-muted); font-size: clamp(0.9rem, 1.5vw, 1rem); line-height: 1.8; margin-bottom: 18px; }
+.about-bio em { font-style: italic; color: var(--flutter-blue); font-style: normal; }
+
+.about-chips {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px;
+}
+.about-chips span {
+  font-size: 0.72rem; letter-spacing: 0.04em; padding: 5px 13px;
+  border: 1px solid var(--border); border-radius: 999px; color: var(--text-muted);
+  transition: all 0.3s;
+}
+.about-chips span:hover { border-color: var(--flutter-blue); color: var(--flutter-blue); background: rgba(84,197,248,0.05); }
+
+.about-meta { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+@media (max-width: 400px) { .about-meta { grid-template-columns: 1fr 1fr; } }
+.meta-item { display: flex; flex-direction: column; gap: 4px; }
+.meta-label { font-size: 0.62rem; color: var(--text-dim); letter-spacing: 0.14em; text-transform: uppercase; font-family: 'JetBrains Mono', monospace; }
+.meta-val { font-size: 0.86rem; color: var(--text-main); display: flex; align-items: center; gap: 6px; }
+.pulse-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: #4ade80;
+  display: inline-block; flex-shrink: 0; animation: pulseDot 2s ease-in-out infinite;
+}
+
+/* ===== SKILLS ===== */
+.skills-header { margin-bottom: 48px; }
+.skills-header h2 {
+  font-family: 'Syne', sans-serif; font-weight: 800;
+  font-size: clamp(2rem, 4.5vw, 3rem); margin-bottom: 10px;
+}
+.skills-header p { color: var(--text-muted); font-size: clamp(0.9rem, 1.5vw, 1rem); }
+
+.gradient-text {
+  background: linear-gradient(135deg, var(--flutter-blue), var(--flutter-cyan));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+
+.skills-grid {
+  display: grid; grid-template-columns: 1fr; gap: 40px; margin-bottom: 56px;
+}
+@media (min-width: 640px) { .skills-grid { grid-template-columns: 1fr 1fr; gap: 56px 64px; } }
+
+.skill-group-title {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.68rem;
+  letter-spacing: 0.18em; text-transform: uppercase; color: var(--flutter-blue);
+  margin-bottom: 24px; padding-bottom: 10px; border-bottom: 1px solid var(--border);
+}
+.skill-bar { margin-bottom: 20px; }
+.skill-bar:last-child { margin-bottom: 0; }
+.skill-bar-info {
+  display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 9px;
+}
+.skill-bar-info span:first-child { font-size: 0.88rem; color: var(--text-main); }
+.skill-pct { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: var(--flutter-blue); }
+.skill-track {
+  height: 3px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden;
+}
+.skill-fill {
+  height: 100%; width: 0%; border-radius: 3px;
+  background: linear-gradient(90deg, #01579B, var(--flutter-blue), var(--flutter-cyan));
+  box-shadow: 0 0 8px rgba(84,197,248,0.45);
+  transition: width 1.2s cubic-bezier(0.16,1,0.3,1);
+}
+.skill-fill.animated { width: var(--pct); }
+
+.tech-chips { display: flex; flex-direction: column; gap: 20px; }
+.tech-cat-label {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.62rem;
+  color: var(--text-dim); letter-spacing: 0.18em; text-transform: uppercase;
+  display: block; margin-bottom: 10px;
+}
+.chips-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  font-size: 0.74rem; padding: 6px 14px;
+  border: 1px solid var(--border); border-radius: 999px;
+  color: var(--text-muted); transition: all 0.3s;
+  background: var(--bg-card);
+}
+.chip:hover { border-color: var(--flutter-blue); color: var(--flutter-blue); background: rgba(84,197,248,0.05); transform: translateY(-1px); }
+
+/* ===== PROJECTS ===== */
+.projects-header { margin-bottom: 48px; }
+.projects-header h2 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: clamp(2rem, 4.5vw, 3rem); margin-bottom: 10px; }
+.projects-header p { color: var(--text-muted); font-size: clamp(0.9rem, 1.5vw, 1rem); }
+
+.projects-grid {
+  display: grid; grid-template-columns: 1fr; gap: 20px;
+}
+@media (min-width: 768px) { .projects-grid { grid-template-columns: 3fr 2fr; gap: 24px; } }
+
+.project-card {
+  border: 1px solid var(--border); border-radius: var(--radius-lg);
+  background: var(--bg-card); overflow: hidden;
+  transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+  position: relative;
+}
+.project-card:hover {
+  border-color: var(--border-hover); transform: translateY(-3px);
+  box-shadow: 0 20px 56px rgba(84,197,248,0.07);
+}
+.project-card.featured { border-color: rgba(84,197,248,0.18); }
+.project-card.featured:hover { box-shadow: 0 20px 56px rgba(84,197,248,0.12); }
+.project-card-inner { padding: 32px; position: relative; }
+@media (max-width: 480px) { .project-card-inner { padding: 24px 20px; } }
+
+.project-glow {
+  position: absolute; top: -30px; right: -30px; width: 180px; height: 180px;
+  background: radial-gradient(circle, rgba(84,197,248,0.1), transparent 70%);
+  pointer-events: none; border-radius: 50%;
+}
+.project-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap; gap: 10px; }
+.project-icon { width: 44px; height: 44px; flex-shrink: 0; }
+.project-badge {
+  font-size: 0.68rem; letter-spacing: 0.07em; padding: 5px 11px; border-radius: 999px;
+  display: flex; align-items: center; gap: 5px;
+}
+.project-badge.live { background: rgba(74,222,128,0.1); color: #4ade80; border: 1px solid rgba(74,222,128,0.22); }
+.project-badge.wip { background: rgba(99,102,241,0.1); color: #818cf8; border: 1px solid rgba(99,102,241,0.18); }
+.live-dot { width: 5px; height: 5px; border-radius: 50%; background: #4ade80; animation: pulseDot 2s infinite; flex-shrink: 0; }
+
+.project-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: clamp(1.5rem, 3vw, 2rem); margin-bottom: 3px; }
+.project-type { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: var(--flutter-blue); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 14px; }
+.project-desc { color: var(--text-muted); font-size: clamp(0.88rem, 1.4vw, 0.95rem); line-height: 1.75; margin-bottom: 18px; }
+.project-stack { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 24px; }
+.project-stack span {
+  font-size: 0.66rem; letter-spacing: 0.05em; text-transform: uppercase;
+  border: 1px solid var(--border); border-radius: 999px; padding: 4px 11px;
+  color: var(--text-muted); background: rgba(84,197,248,0.04);
+  transition: border-color 0.3s, color 0.3s;
+}
+.project-stack span:hover { border-color: var(--flutter-blue); color: var(--flutter-blue); }
+
+.project-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.project-btn {
+  display: inline-flex; align-items: center; gap: 7px; font-size: 0.78rem;
+  letter-spacing: 0.05em; padding: 9px 18px; border-radius: 999px; transition: all 0.3s;
+  border: 1px solid transparent;
+}
+.project-btn.primary {
+  background: linear-gradient(135deg, var(--flutter-blue), var(--flutter-dark));
+  color: #050508; font-weight: 600; box-shadow: 0 0 18px rgba(84,197,248,0.22);
+}
+.project-btn.primary:hover { filter: brightness(1.08); transform: translateY(-1px); box-shadow: 0 5px 24px rgba(84,197,248,0.38); }
+.project-btn.secondary {
+  border-color: var(--border); color: var(--text-muted); background: transparent;
+}
+.project-btn.secondary:hover { border-color: var(--flutter-blue); color: var(--flutter-blue); background: rgba(84,197,248,0.05); }
+
+.project-expand {
+  max-height: 0; overflow: hidden; transition: max-height 0.5s cubic-bezier(0.16,1,0.3,1), border-top-width 0.3s;
+  border-top: 0px solid var(--border);
+}
+.project-card.expanded .project-expand { max-height: 320px; border-top-width: 1px; }
+.expand-content { padding: 22px 32px; }
+@media (max-width: 480px) { .expand-content { padding: 18px 20px; } }
+.expand-content h4 { font-size: 0.68rem; color: var(--text-dim); letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 12px; font-family: 'JetBrains Mono', monospace; }
+.expand-content ul { display: flex; flex-direction: column; gap: 8px; }
+.expand-content ul li { font-size: 0.88rem; color: var(--text-muted); display: flex; align-items: flex-start; gap: 8px; }
+.expand-content ul li::before { content: '→'; color: var(--flutter-blue); flex-shrink: 0; margin-top: 1px; }
+
+/* ===== TIMELINE ===== */
+.exp-header { margin-bottom: 48px; }
+.exp-header h2 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: clamp(2rem, 4.5vw, 3rem); }
+.timeline { position: relative; padding-left: 36px; }
+@media (min-width: 640px) { .timeline { padding-left: 52px; } }
+.timeline-line {
+  position: absolute; left: 5px; top: 6px; bottom: 6px; width: 1px;
+  background: linear-gradient(180deg, transparent, var(--flutter-blue) 12%, var(--flutter-blue) 88%, transparent);
+  box-shadow: 0 0 10px rgba(84,197,248,0.4);
+}
+.t-item { position: relative; padding-bottom: 48px; }
+.t-item:last-child { padding-bottom: 0; }
+.t-dot {
+  position: absolute; left: -34px; top: 4px; width: 12px; height: 12px;
+  border-radius: 50%; background: var(--flutter-blue);
+  box-shadow: 0 0 0 3px rgba(84,197,248,0.15), 0 0 14px rgba(84,197,248,0.55);
+}
+@media (min-width: 640px) { .t-dot { left: -50px; } }
+.t-time { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: var(--flutter-blue); letter-spacing: 0.1em; display: block; margin-bottom: 6px; }
+.t-content h3 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: clamp(1.15rem, 2vw, 1.35rem); margin-bottom: 3px; }
+.t-org { font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-dim); display: block; margin-bottom: 10px; font-family: 'JetBrains Mono', monospace; }
+.t-desc { color: var(--text-muted); font-size: clamp(0.85rem, 1.4vw, 0.93rem); line-height: 1.75; max-width: 580px; margin-bottom: 14px; }
+.t-tags { display: flex; flex-wrap: wrap; gap: 7px; }
+.t-tags span {
+  font-size: 0.66rem; letter-spacing: 0.05em; border: 1px solid var(--border);
+  border-radius: 999px; padding: 3px 11px; color: var(--text-muted); transition: all 0.3s;
+}
+.t-tags span:hover { border-color: var(--flutter-blue); color: var(--flutter-blue); }
+
+/* ===== CONTACT ===== */
+.contact-inner { text-align: center; }
+.contact-title {
+  font-family: 'Syne', sans-serif; font-weight: 800;
+  font-size: clamp(2rem, 6vw, 4.2rem); line-height: 1.1; margin-bottom: 16px;
+}
+.contact-sub { color: var(--text-muted); font-size: clamp(0.9rem, 1.5vw, 1.05rem); max-width: 440px; margin: 0 auto 44px; }
+
+.contact-cards {
+  display: grid; grid-template-columns: 1fr; gap: 14px;
+}
+@media (min-width: 480px) { .contact-cards { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 960px) { .contact-cards { grid-template-columns: repeat(4, 1fr); } }
+
+.contact-card {
+  display: flex; align-items: center; gap: 14px; padding: 18px 20px;
+  border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg-card);
+  transition: all 0.3s; text-align: left; position: relative; overflow: hidden;
+}
+.contact-card::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(84,197,248,0.07), transparent);
+  opacity: 0; transition: opacity 0.3s;
+}
+.contact-card:hover { border-color: var(--border-hover); transform: translateY(-2px); box-shadow: 0 10px 36px rgba(84,197,248,0.08); }
+.contact-card:hover::before { opacity: 1; }
+.contact-card-icon { width: 32px; height: 32px; flex-shrink: 0; color: var(--flutter-blue); display: flex; align-items: center; justify-content: center; }
+.contact-card-icon svg { width: 22px; height: 22px; }
+.contact-card-info { flex: 1; min-width: 0; }
+.contact-card-label { font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; display: block; margin-bottom: 2px; font-family: 'JetBrains Mono', monospace; }
+.contact-card-val { font-size: 0.78rem; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+.contact-card-arrow { color: var(--text-dim); font-size: 0.95rem; transition: color 0.3s, transform 0.3s; flex-shrink: 0; }
+.contact-card:hover .contact-card-arrow { color: var(--flutter-blue); transform: translate(2px, -2px); }
+
+/* ===== FOOTER ===== */
+.footer { border-top: 1px solid var(--border); padding: 28px 0; }
+.footer-inner {
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  font-size: 0.72rem; color: var(--text-dim); font-family: 'JetBrains Mono', monospace;
+  text-align: center;
+}
+@media (min-width: 640px) { .footer-inner { flex-direction: row; justify-content: space-between; text-align: left; } }
+.footer-left { display: flex; align-items: center; gap: 14px; }
+.footer-logo {
+  font-family: 'Syne', sans-serif; font-weight: 800;
+  background: linear-gradient(135deg, var(--flutter-blue), var(--flutter-cyan));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  font-size: 0.88rem;
+}
+
+/* ===== SECTION DIVIDERS ===== */
+.section::before {
+  content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 1px; height: 60px;
+  background: linear-gradient(180deg, transparent, rgba(255,255,255,0.06));
+}
+
+/* ===== REDUCED MOTION ===== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
